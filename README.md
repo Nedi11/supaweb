@@ -14,6 +14,8 @@
 ```sh
 git clone https://github.com/Nedi11/supaweb
 
+cd supaweb
+
 bun install
 
 bunx supabase start
@@ -28,7 +30,7 @@ Make sure you add the functions on /prisma/postgresql-functions to your supabase
 bun dev
 ```
 
-## Start
+## Deploy
 
 First, build your app for production:
 
