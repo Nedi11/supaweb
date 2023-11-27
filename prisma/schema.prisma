@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id               String              @id @db.Uuid
+  name             String?
+  email            String
+  admin            Boolean @default(false)
+  subscriptions  subscription[]
+}
+
+
+model plan{
+  id String @id @default(uuid())
+    productId     Int
+  variantId     Int            @unique
+  name          String?        // Product name
+  description   String?
+  variantName   String
+  sort          Int
+  status        String
+  price         Int
+  interval      String
+  intervalCount Int            @default(1)
+  subscriptions subscription[]
+}
+
+model subscription {
+  id                 Int       @id @default(autoincrement())
+  lemonSqueezyId     Int       @unique
+  orderId            Int       @unique
+  name               String
+  email              String
+  status             String
+  renewsAt           DateTime?
+  endsAt             DateTime?
+  trialEndsAt        DateTime?
+  resumesAt          DateTime?
+  price              Int
+  plan               plan      @relation(fields: [planId], references: [id])
+  planId             String
+  user               user      @relation(fields: [userId], references: [id])
+  userId             String    @db.Uuid
+  isUsageBased       Boolean   @default(false)
+  subscriptionItemId Int?      @unique
+
+  @@index([planId, lemonSqueezyId])
+}
+
+model webhook_event {
+  id              Int       @id @default(autoincrement())
+  createdAt       DateTime  @default(now())
+  eventName       String
+  processed       Boolean   @default(false)
+  body            Json
+  processingError String?
+}

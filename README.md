@@ -1,36 +1,45 @@
-# Welcome to Remix!
+# SUPAWEB
 
-- [Remix Docs](https://remix.run/docs)
+## Tech Stack
 
-## Development
+1. Remix (with Express server and Vite)
+2. Supabase (db & auth)
+3. Prisma
+4. Tailwind
+5. tRPC
+6. Lemonsqueezy
 
-Start the Remix development asset server and the Express server by running:
+## Get started
 
 ```sh
-npm run dev
+git clone https://github.com/Nedi11/supaweb
+
+bun install
+
+bunx supabase start
+
+bun prisma migrate dev
+
 ```
 
-This starts your app in development mode, which will purge the server require cache when Remix rebuilds assets so you don't need a process manager restarting the express server.
+Make sure you add the functions on /prisma/postgresql-functions to your supabase project
 
-## Deployment
+```sh
+bun dev
+```
+
+## Start
 
 First, build your app for production:
 
 ```sh
-npm run build
+bun run build
 ```
 
 Then run the app in production mode:
 
 ```sh
-npm start
+bun start
 ```
 
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying express applications you should be right at home just make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
+Pick a host to deploy to (railway,fly.io...)
