@@ -19,6 +19,11 @@ cd supaweb
 bun install
 
 bunx supabase start
+```
+
+Create and fill .env file based on .env.example
+
+```sh
 
 bun prisma migrate dev
 
