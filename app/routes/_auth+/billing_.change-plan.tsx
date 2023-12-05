@@ -3,9 +3,10 @@ import { Link } from "@remix-run/react";
 import { superjson, useSuperLoaderData, redirect } from "~/utils/superjson";
 import Plans from "~/components/billing/plan";
 import { prisma } from "~/utils/db.server";
-import { getServerSideSession } from "~/utils/auth.server";
+import { getServerSideSession, requireAuth } from "~/utils/auth.server";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
+  await requireAuth(request);
   const { session } = await getServerSideSession(request);
   const subscription = await prisma.subscription.findFirst({
     where: { userId: session?.user.id },
