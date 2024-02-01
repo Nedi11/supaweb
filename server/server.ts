@@ -4,30 +4,23 @@ import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 import { installGlobals } from "@remix-run/node";
-import sourceMapSupport from "source-map-support";
-import {
-  unstable_createViteServer, // provides middleware for handling asset requests
-  unstable_loadViteServerBuild, // handles initial render requests
-} from "@remix-run/dev";
 
 // patch in Remix runtime globals
 installGlobals();
-sourceMapSupport.install();
 
 /**
  * @typedef {import('@remix-run/node').ServerBuild} ServerBuild
  */
-const BUILD_PATH = path.join(process.cwd(), "build/index.js");
+const BUILD_PATH = path.join(process.cwd(), "build/server/index.js");
 
 const vite =
   process.env.NODE_ENV === "production"
     ? undefined
-    : await unstable_createViteServer();
-
-/**
- * Initial build
- * @type {ServerBuild}
- */
+    : await import("vite").then((vite) =>
+        vite.createServer({
+          server: { middlewareMode: true },
+        })
+      );
 
 const app = express();
 
@@ -41,14 +34,17 @@ if (vite) {
   app.use(vite.middlewares);
 } else {
   app.use(
-    "/build",
-    express.static("public/build", { immutable: true, maxAge: "1y" })
+    "/assets",
+    express.static("build/client/assets", {
+      immutable: true,
+      maxAge: "1y",
+    })
   );
 }
 
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
-app.use(express.static("public", { maxAge: "1h" }));
+app.use(express.static("build/client", { maxAge: "1h" }));
 
 app.use(morgan("tiny"));
 
@@ -62,7 +58,7 @@ app.all(
 
   createRequestHandler({
     build: vite
-      ? () => unstable_loadViteServerBuild(vite)
+      ? () => vite.ssrLoadModule("virtual:remix/server-build")
       : await import(BUILD_PATH),
   })
 );
