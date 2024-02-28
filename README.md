@@ -16,23 +16,23 @@ git clone https://github.com/Nedi11/supaweb
 
 cd supaweb
 
-bun install
+npm install
 
-bunx supabase start
+npxx supabase start
 ```
 
 Create and fill .env file based on .env.example
 
 ```sh
 
-bun prisma migrate dev
+npm prisma migrate dev
 
 ```
 
 Make sure you add the functions on /prisma/postgresql-functions to your supabase project
 
 ```sh
-bun dev
+npm run dev
 ```
 
 ## Deploy
@@ -40,13 +40,13 @@ bun dev
 First, build your app for production:
 
 ```sh
-bun run build
+npm run build
 ```
 
 Then run the app in production mode:
 
 ```sh
-bun start
+npm start
 ```
 
 Pick a host to deploy to (railway,fly.io...)
