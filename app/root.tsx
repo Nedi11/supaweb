@@ -125,7 +125,7 @@ export default function App() {
             <Outlet context={{ supabase, session }} />
             <ScrollRestoration />
             <Scripts />
-            <LiveReload />
+
             <Toaster />
           </QueryClientProvider>
         </trpc.Provider>

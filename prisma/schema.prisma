@@ -3,11 +3,14 @@
 
 generator client {
   provider = "prisma-client-js"
+    previewFeatures = [ "multiSchema", "postgresqlExtensions"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  extensions = [pg_graphql(schema: "graphql"),  pgsodium, supabase_vault, uuid_ossp(map: "uuid-ossp", schema: "extensions")]
+  schemas    = ["extensions", "graphql", "public"]
 }
 
 model user {
@@ -16,6 +19,8 @@ model user {
   email            String
   admin            Boolean @default(false)
   subscriptions  subscription[]
+  company          company?
+    @@schema("public")
 }
 
 
@@ -32,6 +37,7 @@ model plan{
   interval      String
   intervalCount Int            @default(1)
   subscriptions subscription[]
+    @@schema("public")
 }
 
 model subscription {
@@ -54,6 +60,7 @@ model subscription {
   subscriptionItemId Int?      @unique
 
   @@index([planId, lemonSqueezyId])
+    @@schema("public")
 }
 
 model webhook_event {
@@ -63,4 +70,100 @@ model webhook_event {
   processed       Boolean   @default(false)
   body            Json
   processingError String?
+    @@schema("public")
+}
+
+model category{
+  id String @default(uuid()) @id
+  name  String
+  canHaveProducts Boolean @default(true)
+  parentId String? 
+  parent  category? @relation("CategoryToCategory",fields: [parentId],references: [id])
+  children category[] @relation("CategoryToCategory")
+  products product[]
+    @@schema("public")
+
+}
+
+model product{
+  id String @id @default(uuid())
+  name String
+  description String
+  category category @relation(fields: [categoryId],references: [id])
+  categoryId String
+  mainProductImage String?
+  images product_image[]
+  company company @relation(fields: [companyId],references: [id])
+  companyId String
+  tags tags_on_product[]
+ attributes attributes_on_product[]
+   @@schema("public")
+}
+
+
+model product_image{
+  id String @id @default(uuid())
+  url String
+  product product @relation(fields: [productId],references: [id])
+  productId String
+    @@schema("public")
+}
+
+model attribute{
+  id String @id @default(uuid())
+  name String
+  
+  products attributes_on_product[]
+    @@schema("public")
+  }
+
+model attributes_on_product{
+  id String @unique @default(uuid())
+  attribute attribute @relation(fields: [attributeId],references: [id])
+  attributeId String
+  product product @relation(fields: [productId],references: [id])
+  productId String
+
+  value String
+
+  @@id([attributeId,productId])
+    @@schema("public")
+}
+
+model tag{
+  id String @id @default(uuid())
+  name String
+  products tags_on_product[]
+    @@schema("public")
+}
+
+
+model tags_on_product{
+  id String @unique @default(uuid())
+  tag tag @relation(fields: [tagId],references: [id])
+  tagId String
+  product product @relation(fields: [productId],references: [id])
+  productId String
+
+  @@id([tagId,productId])
+    @@schema("public")
+}
+
+model company{
+id String @id @default(uuid())
+logo String?
+name String
+country String
+city String
+address String
+zip String
+phone String
+email String
+
+products product[]
+user user @relation(fields: [userId],references: [id])
+userId String @unique @db.Uuid
+
+  @@schema("public")
+
 }
