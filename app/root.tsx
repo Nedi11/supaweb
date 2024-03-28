@@ -116,6 +116,7 @@ export default function App() {
           src="https://app.lemonsqueezy.com/js/lemon.js"
           defer
         ></script>
+        <script src="https://player.vimeo.com/api/player.js"></script>
         <Meta />
         <Links />
       </head>

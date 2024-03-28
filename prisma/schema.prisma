@@ -78,10 +78,11 @@ model category{
   name  String
   canHaveProducts Boolean @default(true)
   parentId String? 
-  parent  category? @relation("CategoryToCategory",fields: [parentId],references: [id])
+  parent  category? @relation("CategoryToCategory",fields: [parentId],references: [id],onDelete: Cascade)
   children category[] @relation("CategoryToCategory")
   products product[]
-    @@schema("public")
+  @@schema("public")
+  @@unique([name,parentId])
 
 }
 

@@ -15,6 +15,8 @@ const server = z.object({
   LEMON_KEY: z.string(),
   LEMON_STORE_ID: z.string(),
   LEMON_SIGN_SECRET: z.string(),
+  TYPESENSE_MASTER_KEY: z.string(),
+  TYPESENSE_SEARCH_KEY: z.string(),
 });
 
 /**
@@ -30,6 +32,8 @@ const processEnv = {
   LEMON_KEY: process.env.LEMON_KEY,
   LEMON_STORE_ID: process.env.LEMON_STORE_ID,
   LEMON_SIGN_SECRET: process.env.LEMON_SIGN_SECRET,
+  TYPESENSE_MASTER_KEY: process.env.TYPESENSE_MASTER_KEY,
+  TYPESENSE_SEARCH_KEY: process.env.TYPESENSE_SEARCH_KEY,
 };
 
 // Don't touch the part below
