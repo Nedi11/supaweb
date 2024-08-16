@@ -10,6 +10,7 @@ import { getServerSideSession } from "~/utils/auth.server";
 import { Nav } from "~/components/nav-bar/Nav";
 import { Footer } from "~/components/Footer";
 import { useState } from "react";
+import { set } from "lodash";
 import Spinner from "~/components/Spinner";
 export const meta = () => {
   const title = `Sign in or Register | CuratedIndustry`;
@@ -50,7 +51,7 @@ export default function Signin() {
       <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
         <div className="flex items-center flex-col justify-center py-12">
           <div className="md:border p-10 flex items-center flex-col rounded-xl md:shadow-2xl w-full max-w-[550px]  ">
-            <span className=" text-xl font-semibold">Sign in</span>
+            <span className=" text-xl font-semibold">Sign up</span>
             <div className="flex flex-col w-full">
               <Label className="mt-3">Email</Label>
               <Input
@@ -69,16 +70,20 @@ export default function Signin() {
               ></Input>
               <Button
                 size={"lg"}
-                className="mt-3 gap-3 transition-all flex"
+                className="mt-3 gap-3"
                 onClick={() => {
                   setIsLoading(true);
                   supabase.auth
-                    .signInWithPassword({
+                    .signUp({
                       email: email,
                       password: password,
                     })
                     .then((res) => {
-                      setError(res.error?.message);
+                      if (res.error) {
+                        setError(res.error?.message);
+                      } else {
+                        setError("Check email for verification link");
+                      }
                     })
                     .finally(() => setIsLoading(false));
                 }}
@@ -88,7 +93,7 @@ export default function Signin() {
                     loading ? "visible" : "w-0"
                   } transition-all text-white`}
                 />
-                Sign in
+                Sign up
               </Button>
               {error && (
                 <span className=" text-red-500 mt-3 w-full text-center">
@@ -96,35 +101,15 @@ export default function Signin() {
                 </span>
               )}
 
-              <Button
-                variant={"link"}
-                className="text-black/50 py-0 h-fit mt-3 "
-                onClick={() => {
-                  supabase.auth
-                    .resetPasswordForEmail(email, {
-                      redirectTo: window.location.origin + "/update-password",
-                    })
-                    .then((res) => {
-                      if (res.error) {
-                        setError(res.error?.message);
-                      } else {
-                        setError("Check email for reset link");
-                      }
-                    });
-                }}
-              >
-                Forgot your password?
-              </Button>
-
               <Link
-                className=" mt-1 inline-flex items-center justify-center h-fit whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 underline-offset-4 hover:underline  px-4  text-black/50"
-                to="/signup"
+                className=" mt-3 inline-flex items-center justify-center h-fit whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 underline-offset-4 hover:underline  px-4  text-black/50"
+                to="/signin"
               >
                 <Button
                   variant={"link"}
                   className="text-black/50 py-0 my-0 h-fit"
                 >
-                  Don't have an account? Sign up
+                  Have an account? Sign in
                 </Button>
               </Link>
             </div>

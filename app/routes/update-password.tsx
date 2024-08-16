@@ -10,6 +10,7 @@ import { getServerSideSession } from "~/utils/auth.server";
 import { Nav } from "~/components/nav-bar/Nav";
 import { Footer } from "~/components/Footer";
 import { useState } from "react";
+import { da } from "@vidstack/react/dist/types/vidstack.js";
 import Spinner from "~/components/Spinner";
 export const meta = () => {
   const title = `Sign in or Register | CuratedIndustry`;
@@ -29,19 +30,19 @@ export const meta = () => {
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { session } = await getServerSideSession(request);
-  const url = new URL(request.url);
-  const redirectPath = url.searchParams.get("redirectPath");
-  if (session) {
-    if (redirectPath) return redirect(path.join("/", redirectPath));
-    return redirect("/");
-  }
+  // const { session } = await getServerSideSession(request);
+  // const url = new URL(request.url);
+  // const redirectPath = url.searchParams.get("redirectPath");
+  // if (session) {
+  //   if (redirectPath) return redirect(path.join("/", redirectPath));
+  //   return redirect("/");
+  // }
   return json({});
 }
 export default function Signin() {
   const { session, supabase } = useRootContext();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [newPassw, setNewPassw] = useState("");
+  const [confirmNewPassw, setConfirmNewPassw] = useState("");
   const [error, setError] = useState<string | undefined>("");
   const [loading, setIsLoading] = useState(false);
   return (
@@ -50,37 +51,47 @@ export default function Signin() {
       <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
         <div className="flex items-center flex-col justify-center py-12">
           <div className="md:border p-10 flex items-center flex-col rounded-xl md:shadow-2xl w-full max-w-[550px]  ">
-            <span className=" text-xl font-semibold">Sign in</span>
+            <span className=" text-xl font-semibold">Password Reset</span>
             <div className="flex flex-col w-full">
-              <Label className="mt-3">Email</Label>
+              <Label className="mt-3">New password</Label>
               <Input
+                type="password"
                 className="mt-1 w-full"
-                placeholder="Your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="New password"
+                value={newPassw}
+                onChange={(e) => {
+                  setNewPassw(e.target.value);
+                }}
               ></Input>
-              <Label className="mt-3">Password</Label>
+              <Label className="mt-3">Confirm new password</Label>
               <Input
                 type="password"
                 className="mt-1"
-                placeholder="Your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Retype your new password"
+                value={confirmNewPassw}
+                onChange={(e) => {
+                  setConfirmNewPassw(e.target.value);
+                }}
               ></Input>
               <Button
                 size={"lg"}
-                className="mt-3 gap-3 transition-all flex"
+                className="mt-3"
                 onClick={() => {
-                  setIsLoading(true);
-                  supabase.auth
-                    .signInWithPassword({
-                      email: email,
-                      password: password,
-                    })
-                    .then((res) => {
-                      setError(res.error?.message);
-                    })
-                    .finally(() => setIsLoading(false));
+                  if (newPassw !== confirmNewPassw) {
+                    setError("Passwords do not match");
+                  } else {
+                    setIsLoading(true);
+                    supabase.auth
+                      .updateUser({ password: newPassw })
+                      .then((data) => {
+                        if (data.error) {
+                          setError(data.error?.message);
+                        } else {
+                          setError("Success! Password updated");
+                        }
+                      })
+                      .finally(() => setIsLoading(false));
+                  }
                 }}
               >
                 <Spinner
@@ -88,47 +99,14 @@ export default function Signin() {
                     loading ? "visible" : "w-0"
                   } transition-all text-white`}
                 />
-                Sign in
+                Reset password
               </Button>
-              {error && (
-                <span className=" text-red-500 mt-3 w-full text-center">
-                  {error}
-                </span>
-              )}
-
-              <Button
-                variant={"link"}
-                className="text-black/50 py-0 h-fit mt-3 "
-                onClick={() => {
-                  supabase.auth
-                    .resetPasswordForEmail(email, {
-                      redirectTo: window.location.origin + "/update-password",
-                    })
-                    .then((res) => {
-                      if (res.error) {
-                        setError(res.error?.message);
-                      } else {
-                        setError("Check email for reset link");
-                      }
-                    });
-                }}
-              >
-                Forgot your password?
-              </Button>
-
-              <Link
-                className=" mt-1 inline-flex items-center justify-center h-fit whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 underline-offset-4 hover:underline  px-4  text-black/50"
-                to="/signup"
-              >
-                <Button
-                  variant={"link"}
-                  className="text-black/50 py-0 my-0 h-fit"
-                >
-                  Don't have an account? Sign up
-                </Button>
-              </Link>
             </div>
-
+            {error && (
+              <span className=" text-red-500 mt-3 w-full text-center">
+                {error}
+              </span>
+            )}
             {/* <Auth
           
               supabaseClient={supabase}

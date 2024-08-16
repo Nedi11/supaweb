@@ -2,8 +2,8 @@
   "include": ["env.d.ts", "**/*.ts", "**/*.tsx", "env.mjs"],
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "module": "esnext",
-    "target": "esnext",
+    "module": "ESNext",
+    "target": "ESNext",
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
