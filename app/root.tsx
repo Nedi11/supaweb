@@ -74,7 +74,6 @@ export default function App() {
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() =>
     trpc.createClient({
-      transformer: superjsonTransformer,
       links: [
         loggerLink({
           enabled: (opts) =>
@@ -83,6 +82,7 @@ export default function App() {
         }),
         httpBatchLink({
           url: url,
+          transformer: superjsonTransformer,
         }),
       ],
     })
@@ -134,6 +134,6 @@ export default function App() {
   );
 }
 
-export function useSupabase() {
+export function useRootContext() {
   return useOutletContext<ContextType>();
 }
